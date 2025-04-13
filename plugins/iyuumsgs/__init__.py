@@ -19,7 +19,7 @@ class IyuuMsgs(_PluginBase):
     # 插件图标
     plugin_icon = "Iyuu_A.png"
     # 插件版本
-    plugin_version = "1.1"
+    plugin_version = "1.2"
     # 插件作者
     plugin_author = "waterz"
     # 作者主页
@@ -44,8 +44,8 @@ class IyuuMsgs(_PluginBase):
     last_send_time = 0
     # 消息队列
     message_queue = Queue()
-    # 消息发送间隔（秒）
-    send_interval = 5
+    # 消息发送间隔（秒）6分钟 由于爱语飞飞一小时限制20条，以两个号的情况来看，6分钟发两条，间隔6分钟也可以接受，这样就不用花心思写什么失败重试了，也不至于漏消息
+    send_interval = 360
     # 退出事件
     __event = threading.Event()
 
@@ -233,11 +233,8 @@ class IyuuMsgs(_PluginBase):
                 except Exception as msg_e:
                     logger.error(f"Token {valid_tokens} 发送失败：{str(msg_e)}")
                 # 每个Token发送间隔（新增间隔控制）
-                # current_time = time()
-                # if current_time - self.last_send_time < self.send_interval:
-                #     sleep_time = self.send_interval - (current_time - self.last_send_time)
-                #     sleep(sleep_time)
-                # self.last_send_time = time()
+                sleep(5)
+
 
             # 标记任务完成
             self.message_queue.task_done()
