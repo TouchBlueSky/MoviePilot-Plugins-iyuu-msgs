@@ -153,7 +153,7 @@ class IyuuMsgs(_PluginBase):
             }
         ], {
             "enabled": False,
-            'token': "",
+            'tokens': "",
             'msgtypes': []
         }
 
