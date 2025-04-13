@@ -160,9 +160,6 @@ class IyuuMsgs(_PluginBase):
     def get_page(self) -> List[dict]:
         pass
         
-    def get_state(self) -> bool:
-        return self._enabled and bool(self._tokens)  # 检测Token列表是否为空
-        
     @eventmanager.register(EventType.NoticeMessage)
     def send(self, event: Event):
         """
@@ -234,7 +231,7 @@ class IyuuMsgs(_PluginBase):
                     else:
                         logger.warn("IYUU消息发送失败，未获取到返回信息")
                 except Exception as msg_e:
-                    logger.error(f"Token {token} 发送失败：{str(msg_e)}")
+                    logger.error(f"Token {valid_tokens} 发送失败：{str(msg_e)}")
                 # 每个Token发送间隔（新增间隔控制）
                 current_time = time()
                 if current_time - self.last_send_time < self.send_interval:
