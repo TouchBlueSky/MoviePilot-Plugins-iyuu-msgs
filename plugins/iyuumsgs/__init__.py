@@ -212,10 +212,12 @@ class IyuuMsgs(_PluginBase):
                 continue
             # 循环发送给所有Token（新增代码）
             for valid_tokens in self._tokens.split(","):
+                if not valid_tokens:
+                    continue
                 # 尝试发送消息
                 try:
                     # 构造请求URL（修改为当前token）
-                    sc_url = f"https://iyuu.cn/{token}.send?{urlencode({'text': title, 'desp': text})}"
+                    sc_url = f"https://iyuu.cn/{valid_tokens}.send?{urlencode({'text': title, 'desp': text})}"
                     res = RequestUtils().get_res(sc_url)
                     if res and res.status_code == 200:
                         ret_json = res.json()
