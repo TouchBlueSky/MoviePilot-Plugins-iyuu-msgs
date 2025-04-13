@@ -3,7 +3,7 @@
         "name": "IYUU消息推送多人版",
         "description": "支持使用IYUU发送多人消息通知。",
         "labels": "消息通知,IYUU,多人",
-        "version": "1.0",
+        "version": "1.1",
         "icon": "Iyuu_A.png",
         "author": "waterz",
         "level": 1,
