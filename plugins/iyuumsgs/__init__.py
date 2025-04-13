@@ -233,11 +233,11 @@ class IyuuMsgs(_PluginBase):
                 except Exception as msg_e:
                     logger.error(f"Token {valid_tokens} 发送失败：{str(msg_e)}")
                 # 每个Token发送间隔（新增间隔控制）
-                current_time = time()
-                if current_time - self.last_send_time < self.send_interval:
-                    sleep_time = self.send_interval - (current_time - self.last_send_time)
-                    sleep(sleep_time)
-                self.last_send_time = time()
+                # current_time = time()
+                # if current_time - self.last_send_time < self.send_interval:
+                #     sleep_time = self.send_interval - (current_time - self.last_send_time)
+                #     sleep(sleep_time)
+                # self.last_send_time = time()
 
             # 标记任务完成
             self.message_queue.task_done()
