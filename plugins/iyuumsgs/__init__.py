@@ -56,14 +56,14 @@ class IyuuMsgs(_PluginBase):
             self._tokens = config.get("tokens")
             self._msgtypes = config.get("msgtypes") or []
 
-            if self._enabled and self._token:
+            if self._enabled and self._tokens:
                 # 启动处理队列的后台线程
                 self.processing_thread = threading.Thread(target=self.process_queue)
                 self.processing_thread.daemon = True
                 self.processing_thread.start()
 
     def get_state(self) -> bool:
-        return self._enabled and (True if self._token else False)
+        return self._enabled and (True if self._tokens else False)
 
     @staticmethod
     def get_command() -> List[Dict[str, Any]]:
