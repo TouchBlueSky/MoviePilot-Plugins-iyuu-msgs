@@ -36,7 +36,7 @@ class IyuuMsgs(_PluginBase):
     # _token = None
     _msgtypes = []
     # 原 self._token 改为 self._tokens
-    _tokens = []
+    _tokens:str = ""
     
     # 消息处理线程
     processing_thread = None
@@ -53,11 +53,8 @@ class IyuuMsgs(_PluginBase):
         self.__event.clear()
         if config:
             self._enabled = config.get("enabled")
-            #self._token = config.get("token")
+            self._tokens = config.get("tokens")
             self._msgtypes = config.get("msgtypes") or []
-            # 处理多行Token输入
-            if config and config.get("tokens"):
-                self._tokens = [t.strip() for t in config.get("tokens").split('\n') if t.strip()]
 
             if self._enabled and self._token:
                 # 启动处理队列的后台线程
@@ -116,16 +113,13 @@ class IyuuMsgs(_PluginBase):
                         'content': [
                             {
                                 'component': 'VCol',
-                                'props': { 'cols': 12 },
                                 'content': [
                                     {
-                                        'component': 'VTextarea',
+                                        'component': 'VTextField',
                                         'props': {
                                             'model': 'tokens',  # 字段名改为复数
                                             'label': 'IYUU令牌',
-                                            'placeholder': '每行输入一个IYUU令牌\n例如：IYUU123\nIYUU456',
-                                            'rows': 3,
-                                            'auto-grow': True
+                                            'placeholder': '多个IYUU令牌使用,隔开例如：IYUU123,IYUU456',
                                         }
                                     }
                                 ]
@@ -159,7 +153,7 @@ class IyuuMsgs(_PluginBase):
             }
         ], {
             "enabled": False,
-            'token': '',
+            'token': "",
             'msgtypes': []
         }
 
@@ -217,8 +211,7 @@ class IyuuMsgs(_PluginBase):
                 logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
                 continue
             # 循环发送给所有Token（新增代码）
-            valid_tokens = [t.strip() for t in self._tokens if t.strip()]
-            for token in valid_tokens:
+            for valid_tokens in self._tokens.split(","):
                 # 尝试发送消息
                 try:
                     # 构造请求URL（修改为当前token）
