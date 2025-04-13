@@ -11,7 +11,7 @@ from app.schemas.types import EventType, NotificationType
 from app.utils.http import RequestUtils
 
 
-class IyuuMsg(_PluginBase):
+class IyuuMsgs(_PluginBase):
     # 插件名称
     plugin_name = "IYUU消息通知多人版"
     # 插件描述
