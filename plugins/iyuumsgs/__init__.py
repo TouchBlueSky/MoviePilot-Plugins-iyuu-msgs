@@ -33,9 +33,11 @@ class IyuuMsg(_PluginBase):
 
     # 私有属性
     _enabled = False
-    _token = None
+    # _token = None
     _msgtypes = []
-
+    # 原 self._token 改为 self._tokens
+    _tokens = []
+    
     # 消息处理线程
     processing_thread = None
     # 上次发送时间
@@ -51,8 +53,11 @@ class IyuuMsg(_PluginBase):
         self.__event.clear()
         if config:
             self._enabled = config.get("enabled")
-            self._token = config.get("token")
+            #self._token = config.get("token")
             self._msgtypes = config.get("msgtypes") or []
+            # 处理多行Token输入
+            if config and config.get("tokens"):
+                self._tokens = [t.strip() for t in config.get("tokens").split('\n') if t.strip()]
 
             if self._enabled and self._token:
                 # 启动处理队列的后台线程
@@ -111,16 +116,16 @@ class IyuuMsg(_PluginBase):
                         'content': [
                             {
                                 'component': 'VCol',
-                                'props': {
-                                    'cols': 12
-                                },
+                                'props': { 'cols': 12 },
                                 'content': [
                                     {
-                                        'component': 'VTextField',
+                                        'component': 'VTextarea',
                                         'props': {
-                                            'model': 'token',
+                                            'model': 'tokens',  # 字段名改为复数
                                             'label': 'IYUU令牌',
-                                            'placeholder': 'IYUUxxx',
+                                            'placeholder': '每行输入一个IYUU令牌\n例如：IYUU123\nIYUU456',
+                                            'rows': 3,
+                                            'auto-grow': True
                                         }
                                     }
                                 ]
@@ -160,7 +165,10 @@ class IyuuMsg(_PluginBase):
 
     def get_page(self) -> List[dict]:
         pass
-
+        
+    def get_state(self) -> bool:
+        return self._enabled and bool(self._tokens)  # 检测Token列表是否为空
+        
     @eventmanager.register(EventType.NoticeMessage)
     def send(self, event: Event):
         """
@@ -208,27 +216,36 @@ class IyuuMsg(_PluginBase):
             if msg_type and self._msgtypes and msg_type.name not in self._msgtypes:
                 logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
                 continue
-
-            # 尝试发送消息
-            try:
-                sc_url = "https://iyuu.cn/%s.send?%s" % (self._token, urlencode({"text": title, "desp": text}))
-                res = RequestUtils().get_res(sc_url)
-                if res and res.status_code == 200:
-                    ret_json = res.json()
-                    errno = ret_json.get('errcode')
-                    error = ret_json.get('errmsg')
-                    if errno == 0:
-                        logger.info("IYUU消息发送成功")
-                        # 更新上次发送时间
-                        self.last_send_time = time()
+            # 循环发送给所有Token（新增代码）
+            valid_tokens = [t.strip() for t in self._tokens if t.strip()]
+            for token in valid_tokens:
+                # 尝试发送消息
+                try:
+                    # 构造请求URL（修改为当前token）
+                    sc_url = f"https://iyuu.cn/{token}.send?{urlencode({'text': title, 'desp': text})}"
+                    res = RequestUtils().get_res(sc_url)
+                    if res and res.status_code == 200:
+                        ret_json = res.json()
+                        errno = ret_json.get('errcode')
+                        error = ret_json.get('errmsg')
+                        if errno == 0:
+                            logger.info("IYUU消息发送成功")
+                            # 更新上次发送时间
+                            self.last_send_time = time()
+                        else:
+                            logger.warn(f"IYUU消息发送失败，错误码：{errno}，错误原因：{error}")
+                    elif res is not None:
+                        logger.warn(f"IYUU消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}")
                     else:
-                        logger.warn(f"IYUU消息发送失败，错误码：{errno}，错误原因：{error}")
-                elif res is not None:
-                    logger.warn(f"IYUU消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}")
-                else:
-                    logger.warn("IYUU消息发送失败，未获取到返回信息")
-            except Exception as msg_e:
-                logger.error(f"IYUU消息发送失败，{str(msg_e)}")
+                        logger.warn("IYUU消息发送失败，未获取到返回信息")
+                except Exception as msg_e:
+                    logger.error(f"Token {token} 发送失败：{str(msg_e)}")
+                # 每个Token发送间隔（新增间隔控制）
+                current_time = time()
+                if current_time - self.last_send_time < self.send_interval:
+                    sleep_time = self.send_interval - (current_time - self.last_send_time)
+                    sleep(sleep_time)
+                self.last_send_time = time()
 
             # 标记任务完成
             self.message_queue.task_done()
