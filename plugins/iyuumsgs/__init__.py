@@ -119,7 +119,7 @@ class IyuuMsgs(_PluginBase):
                                         'props': {
                                             'model': 'tokens',  # 字段名改为复数
                                             'label': 'IYUU令牌',
-                                            'placeholder': '多个IYUU令牌使用,隔开例如：IYUU123,IYUU456',
+                                            'placeholder': '多个IYUU令牌使用,隔开例如：IYUU123,IYUU456'
                                         }
                                     }
                                 ]
