@@ -19,7 +19,7 @@ class IyuuMsgs(_PluginBase):
     # 插件图标
     plugin_icon = "Iyuu_A.png"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     # 插件作者
     plugin_author = "waterz"
     # 作者主页
@@ -186,15 +186,17 @@ class IyuuMsgs(_PluginBase):
             if self.__event.is_set():
                 logger.info("消息发送线程正在退出...")
                 break
-            # 获取队列中的下一条消息
-            msg_body = self.message_queue.get()
+            
 
             # 检查是否满足发送间隔时间
             current_time = time()
             time_since_last_send = current_time - self.last_send_time
             if time_since_last_send < self.send_interval:
                 sleep(self.send_interval - time_since_last_send)
-
+                
+            # 获取队列中的下一条消息
+            msg_body = self.message_queue.get()
+            
             # 处理消息内容
             channel = msg_body.get("channel")
             if channel:
@@ -233,7 +235,7 @@ class IyuuMsgs(_PluginBase):
                 except Exception as msg_e:
                     logger.error(f"Token {valid_tokens} 发送失败：{str(msg_e)}")
                 # 每个Token发送间隔（新增间隔控制）
-                sleep(5)
+                # sleep(5)
 
 
             # 标记任务完成
