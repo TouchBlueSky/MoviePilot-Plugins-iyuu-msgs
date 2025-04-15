@@ -19,7 +19,7 @@ class IyuuMsgs(_PluginBase):
     # 插件图标
     plugin_icon = "Iyuu_A.png"
     # 插件版本
-    plugin_version = "1.6"
+    plugin_version = "1.7"
     # 插件作者
     plugin_author = "waterz"
     # 作者主页
@@ -197,6 +197,9 @@ class IyuuMsgs(_PluginBase):
             # 获取队列中的下一条消息
             msg_body = self.message_queue.get()
             
+            # 标记任务完成
+            self.message_queue.task_done()
+            
             # 处理消息内容
             channel = msg_body.get("channel")
             if channel:
@@ -238,8 +241,7 @@ class IyuuMsgs(_PluginBase):
                 sleep(5)
 
 
-            # 标记任务完成
-            self.message_queue.task_done()
+            
 
     def stop_service(self):
         """
