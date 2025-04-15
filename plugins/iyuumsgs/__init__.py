@@ -19,7 +19,7 @@ class IyuuMsgs(_PluginBase):
     # 插件图标
     plugin_icon = "Iyuu_A.png"
     # 插件版本
-    plugin_version = "1.4"
+    plugin_version = "1.5"
     # 插件作者
     plugin_author = "waterz"
     # 作者主页
@@ -45,8 +45,7 @@ class IyuuMsgs(_PluginBase):
     # 消息队列
     message_queue = Queue()
     # 消息发送间隔（秒）6分钟 由于爱语飞飞一小时限制20条，以两个号的情况来看，6分钟发两条，间隔6分钟也可以接受，这样就不用花心思写什么失败重试了，也不至于漏消息
-    # 可能这里还是不能太久，不然会卡别的运行，还是改回5吧，那就会漏消息，自己减少对消息的依赖吧，满足一个ip每小时20条以内
-    send_interval = 5
+    send_interval = 360
     # 退出事件
     __event = threading.Event()
 
@@ -217,7 +216,7 @@ class IyuuMsgs(_PluginBase):
                 # 尝试发送消息
                 try:
                     # 构造请求URL（修改为当前token）
-                    sc_url = f"https://iyuu.cn/{valid_tokens}.send?{urlencode({'text': title, 'desp': text})}"
+                    sc_url = "https://iyuu.cn/%s.send?%s" % ({valid_tokens}, urlencode({"text": title, "desp": text}))
                     res = RequestUtils().get_res(sc_url)
                     if res and res.status_code == 200:
                         ret_json = res.json()
