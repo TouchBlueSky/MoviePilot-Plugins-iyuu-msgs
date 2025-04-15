@@ -19,7 +19,7 @@ class IyuuMsgs(_PluginBase):
     # 插件图标
     plugin_icon = "Iyuu_A.png"
     # 插件版本
-    plugin_version = "1.5"
+    plugin_version = "1.6"
     # 插件作者
     plugin_author = "waterz"
     # 作者主页
@@ -216,7 +216,7 @@ class IyuuMsgs(_PluginBase):
                 # 尝试发送消息
                 try:
                     # 构造请求URL（修改为当前token）
-                    sc_url = "https://iyuu.cn/%s.send?%s" % ({valid_tokens}, urlencode({"text": title, "desp": text}))
+                    sc_url = "https://iyuu.cn/%s.send?%s" % (valid_tokens, urlencode({"text": title, "desp": text}))
                     res = RequestUtils().get_res(sc_url)
                     if res and res.status_code == 200:
                         ret_json = res.json()
@@ -227,15 +227,15 @@ class IyuuMsgs(_PluginBase):
                             # 更新上次发送时间
                             self.last_send_time = time()
                         else:
-                            logger.warn(f"IYUU消息发送失败，错误码：{errno}，错误原因：{error}")
+                            logger.warn(f"IYUU消息发送失败1，错误码：{errno}，错误原因：{error}")
                     elif res is not None:
-                        logger.warn(f"IYUU消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}")
+                        logger.warn(f"IYUU消息发送失败2，错误码：{res.status_code}，错误原因：{res.reason}")
                     else:
                         logger.warn("IYUU消息发送失败，未获取到返回信息")
                 except Exception as msg_e:
                     logger.error(f"Token {valid_tokens} 发送失败：{str(msg_e)}")
                 # 每个Token发送间隔（新增间隔控制）
-                # sleep(5)
+                sleep(5)
 
 
             # 标记任务完成
